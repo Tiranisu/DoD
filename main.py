@@ -21,8 +21,14 @@ async def list_containers(interaction: discord.Interaction):
         container = dkclient.containers.get(container_allowed)
         containers_recovered.append(container) 
     containers_lines = "\n".join(f"- {container.name} : {container.status}" for container in containers_recovered)
-    message = f"Here is the list of the containers : {containers_lines}"
+    message = f"Here is the list of the containers : \n{containers_lines}"
     await interaction.response.send_message(message)
+
+@tree.command(name="docker_start", description="Start a container from the allowed list")
+async def docker_start(interaction: discord.Interaction, container_name: str):
+    container = dkclient.containers.get(container_name)
+    await container.start()
+    await interaction.response.send_message(f"Container {container_name} successfully started !")
 
 @client.event
 async def on_ready():

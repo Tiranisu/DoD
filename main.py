@@ -8,6 +8,7 @@ load_dotenv()
 client = discord.Client(intents=discord.Intents.default())
 tree = app_commands.CommandTree(client)
 dkclient = docker.from_env()
+CONTAINERS_ALLOWED = os.getenv("CONTAINERS_ALLOWED").split(",")
 
 @tree.command(name="pouf", description="ping the bot")
 async def ping(interaction: discord.Interaction):
@@ -15,11 +16,13 @@ async def ping(interaction: discord.Interaction):
     
 @tree.command(name="list_containers", description="List all Docker containers")
 async def list_containers(interaction: discord.Interaction):
-    containers = dkclient.containers.list(all=True)
-    for container in containers:
-        print(container.name, container.status)
-        
-    await interaction.response.send_message(f"Container: {containers}, Status: {containers}")
+    containers_recovered = []
+    for container_allowed in CONTAINERS_ALLOWED:
+        container = dkclient.containers.get(container_allowed)
+        containers_recovered.append(container) 
+    containers_lines = "\n".join(f"- {container.name} : {container.status}" for container in containers_recovered)
+    message = f"Here is the list of the containers : {containers_lines}"
+    await interaction.response.send_message(message)
 
 @client.event
 async def on_ready():

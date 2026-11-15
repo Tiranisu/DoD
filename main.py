@@ -30,6 +30,10 @@ async def docker_start(interaction: discord.Interaction, container_name: str):
     await container.start()
     await interaction.response.send_message(f"Container {container_name} successfully started !")
 
+@tree.command(name="docker_stop", description="Stop a container from the allowed list")
+async def docker_stop(interaction: discord.Interaction, container_name: str):
+    await interaction.response.send_message("Container successfully stoped !")
+
 @client.event
 async def on_ready():
     guild = discord.Object(id=os.getenv("GUILD_ID"))

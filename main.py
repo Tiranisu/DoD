@@ -26,10 +26,16 @@ async def list_containers(interaction: discord.Interaction):
 
 @tree.command(name="docker_start", description="Start a container from the allowed list")
 async def docker_start(interaction: discord.Interaction, container_name: str):
-    container = dkclient.containers.get(container_name)
-    await container.start()
-    await interaction.response.send_message(f"Container {container_name} successfully started !")
-
+    if container_name not in CONTAINERS_ALLOWED:
+        return await interaction.response.send_message("Container not found")
+    try:
+        container = dkclient.containers.get(container_name)
+        container.start()
+        await interaction.response.send_message(f"Container {container_name} successfully started !")
+    except docker.errors as e:
+        print(e)
+        await interaction.response.send_message(f"Error : {e}")
+        
 @tree.command(name="docker_stop", description="Stop a container from the allowed list")
 async def docker_stop(interaction: discord.Interaction, container_name: str):
     await interaction.response.send_message("Container successfully stoped !")
